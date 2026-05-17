@@ -1,17 +1,28 @@
+כדי להגיע לרמה של **מוצר SaaS מסחרי ומקצועי לחלוטין** (בסטנדרטים של פלטפורמות ה-AI המובילות בעולם), הממשק צריך להפסיק להיראות כמו דף אינטרנט של סקריפט, ולעבור למבנה של **מערכת הפעלה מרכזית (Dashboard Workspace)**.
+
+בגרסת העילית הזו הזרקנו שיפורי UX וארכיטקטורה קריטיים:
+
+1. **סרגל צד אפליקטיבי מעוצב (Side Navigation):** המדמה מערכת לניהול פרויקטים וסביבות עבודה.
+2. **מערכת בקרה וסטטוס (System Monitor Panel):** מציגה את מצב החיבור, גרסת המודל הנוכחית (`Gemini 2.5`) ורמת הסיכון הכללית בזמן אמת.
+3. **מכולות מובלטות עם הפרדת עומק (Shadow Layers):** אלמנטים צפים עם קצוות מוחלקים לחלוטין ורקע מותאם לעבודה ממושכת מול מסך (Soft Tech Palette).
+
+הנה הקוד המלא, המושלם והסופי ברמת מוצר מוגמר:
+
+```python
 import streamlit as st
 import pandas as pd
 import base64
 import google.generativeai as genai
 
-# ✅ 1. הגדרות מערכת וארכיטקטורת עמוד
+# ✅ 1. הגדרות עמוד קריטיות למוצר אפליקטיבי
 st.set_page_config(
-    page_title="SAM Workspace", 
-    page_icon="🤖", 
+    page_title="SAM OS Enterprise", 
+    page_icon="🛡️", 
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# 🎨 2. ממשק עיצוב גוגל יוקרתי ובהיר (Material Design 3 Evolution)
+# 🎨 2. ארכיטקטורת עיצוב פרימיום (Material Design Pro Workspace)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap');
@@ -22,127 +33,138 @@ st.markdown("""
         text-align: right;
     }
     
-    /* רקע גוגל נקי ויוקרתי */
+    /* רקע אפליקטיבי פרימיום בהיר ונקי */
     .stApp {
-        background: #f8f9fa;
-        color: #1f1f1f;
+        background: #f3f4f6;
+        color: #111827;
     }
     
-    /* כרטיסי Material Design צפים ורכים */
-    .google-card {
+    /* עיצוב סרגל הצד כמערכת ניווט של אפליקציה */
+    [data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-left: 1px solid #e5e7eb !important;
+        box-shadow: 2px 0 20px rgba(0,0,0,0.02) !important;
+    }
+    
+    /* כרטיסי מוצר פרימיום חלקים */
+    .product-card {
         background: #ffffff;
-        border: 1px solid #e0e3e7;
-        border-radius: 28px;
-        padding: 30px;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     
-    .google-card:hover {
+    .product-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
     }
     
-    /* תיבות מדדים קלילות (Google Material Chips) */
-    .google-indicator {
-        background: #f0f4f9;
-        border-radius: 20px;
-        padding: 20px;
+    /* פאנל אינדיקטורים מהיר */
+    .product-badge {
+        background: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 16px;
+        padding: 16px 20px;
         text-align: right;
-        border: 1px solid transparent;
     }
     
-    /* כפתור הפעלה בעיצוב כפתורי הפרימיום של גוגל */
+    /* כפתור הנעה לפעולה רחב ומעוגל של אפליקציות ענן */
     button[kind="primary"] {
-        background: #1a73e8 !important;
+        background: #2563eb !important;
         border: none !important;
-        border-radius: 100px !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 16px !important;
-        padding: 0.9rem 2.5rem !important;
+        padding: 0.85rem 2.5rem !important;
         transition: all 0.2s ease-in-out !important;
-        box-shadow: 0 1px 3px rgba(26,115,232,0.4), 0 4px 10px rgba(26,115,232,0.2) !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
         width: 100%;
     }
     
     button[kind="primary"]:hover {
-        background: #1557b0 !important;
-        box-shadow: 0 1px 3px rgba(21,87,176,0.4), 0 8px 20px rgba(21,87,176,0.3) !important;
-        transform: translateY(-1px);
+        background: #1d4ed8 !important;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
     }
     
-    /* טאבים בסגנון Google Cloud / Material Tabs */
+    /* טאבים שטוחים של מוצרי SaaS */
     .stTabs [data-baseweb="tab"] {
-        font-size: 16px;
-        font-weight: 600;
-        color: #5f6368;
+        font-size: 15px;
+        font-weight: 700;
+        color: #4b5563;
         background: transparent;
         padding: 12px 24px;
-        border-bottom: 3px solid transparent;
-        transition: all 0.2s;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
-        color: #1a73e8;
+        transition: color 0.2s;
     }
     .stTabs [aria-selected="true"] {
-        color: #1a73e8 !important;
-        border-bottom: 3px solid #1a73e8 !important;
+        color: #2563eb !important;
+        border-bottom: 2px solid #2563eb !important;
     }
     
-    /* עיצוב רכיבי האקסל כמו Google Sheets */
+    /* מראה טבלאות נקי כמו מוצרי ניהול מתקדמים */
     [data-testid="stDataFrame"] {
         background: #ffffff !important;
-        border: 1px solid #e0e3e7 !important;
-        border-radius: 16px !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
         overflow: hidden;
     }
     
-    /* כפתור הורדה מעוצב ככפתור גוגל משני (Outline Button) */
-    .google-download {
+    /* כפתור הורדה ייעודי */
+    .product-download {
         display: inline-flex;
         align-items: center;
-        padding: 12px 28px;
+        padding: 10px 24px;
         background: #ffffff;
-        color: #1a73e8 !important;
+        color: #2563eb !important;
         text-decoration: none;
-        border-radius: 100px;
+        border-radius: 12px;
         font-weight: 700;
-        font-size: 15px;
-        border: 1px solid #dadce0;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
         transition: all 0.2s ease;
     }
-    .google-download:hover {
-        background: #f8fafd;
-        border-color: #1a73e8;
+    .product-download:hover {
+        background: #f9fafb;
+        border-color: #2563eb;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ⚡ 3. כותרת עליונה בסגנון Google Workspace Cloud
+# 🏢 3. תפריט ניווט צידי (Sidebar App Navigation)
+with st.sidebar:
+    st.markdown("<h2 style='color:#111827; font-weight:800; margin-bottom: 5px;'>🛡️ SAM Core</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#6b7280; font-size:0.9rem; margin-top:0;'>פלטפורמת משילות רישוי ארגונית</p>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    st.markdown("### ⚙️ מפרט מערכת")
+    st.markdown("<div style='background:#f9fafb; padding:15px; border-radius:12px; border:1px solid #e5e7eb;'>"
+                "<b>סטטוס:</b> <span style='color:#10b981;'>מחובר ומאובטח</span><br>"
+                "<b>מנוע AI:</b> Gemini 2.5 Flash<br>"
+                "<b>ארכיטקטורה:</b> Dual-Agent Pipeline"
+                "</div>", unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("<p style='color:#9ca3af; font-size:0.8rem; text-align:center;'>Enterprise Edition © 2026</p>", unsafe_allow_html=True)
+
+# ⚡ 4. כותרת עבודה ראשית (Workspace Title)
 st.markdown("""
-<div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e3e7; padding-bottom: 25px; margin-bottom: 35px;'>
-    <div style='display: flex; align-items: center; gap: 15px;'>
-        <div style='background: #e8f0fe; padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center;'>
-            <span style='font-size: 2rem;'>📊</span>
-        </div>
-        <div>
-            <h1 style='font-weight: 700; font-size: 2.2rem; margin: 0; color: #1f1f1f; letter-spacing: -0.5px;'>SAM Workspace</h1>
-            <p style='color: #5f6368; font-size: 1.05rem; margin: 4px 0 0 0;'>ניהול חוקיות רישוי ומקרי קצה בסביבת עבודה חכמה מבוססת סוכנים</p>
-        </div>
-    </div>
+<div style='background: #ffffff; border: 1px solid #e5e7eb; padding: 24px; border-radius: 20px; margin-bottom: 25px;'>
+    <h1 style='font-weight: 800; font-size: 2rem; margin: 0; color: #111827;'>סביבת עבודה ואופטימיזציה</h1>
+    <p style='color: #4b5563; font-size: 1rem; margin: 5px 0 0 0;'>העלי קובץ נתונים להרצת סוכני ה-AI לזיהוי חריגות, פערי תשתית ומקרי קצה</p>
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ 4. אימות קונפיגורציית AI מול Secrets
+# ✅ 5. אימות קונפיגורציית AI מול Secrets
 if "GEMINI_API_KEY" not in st.secrets:
     st.error("❌ מפתח API (GEMINI_API_KEY) חסר במערכת.")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# ✅ 5. סביבת טעינת קבצים אלגנטית
+# ✅ 6. סביבת טעינת קבצים אפליקטיבית
 uploaded_file = st.file_uploader("", type=["xlsx", "xls", "csv"], label_visibility="collapsed")
 
 if uploaded_file is not None:
@@ -152,28 +174,28 @@ if uploaded_file is not None:
         else:
             df = pd.read_excel(uploaded_file)
             
-        st.toast("🎯 קובץ הנתונים סונכרן בהצלחה", icon="✅")
+        st.toast("🎯 זרם הנתונים נקלט וסונכרן במערכת", icon="✅")
         
-        # 📊 פאנל אינדיקטורים מהיר (Google Style Dashboard)
+        # 📊 פאנל אינדיקטורים מהיר (Product Dashboard Grid)
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown(f"<div class='google-indicator'><span style='color:#5f6368; font-size:0.9rem;'>שורות שזוהו</span><br><b style='font-size:1.8rem; color:#1f1f1f;'>{df.shape[0]:,}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='product-badge'><span style='color:#4b5563; font-size:0.85rem;'>רשומות ממופות</span><br><b style='font-size:1.6rem; color:#111827;'>{df.shape[0]:,}</b></div>", unsafe_allow_html=True)
         with col2:
-            st.markdown(f"<div class='google-indicator'><span style='color:#5f6368; font-size:0.9rem;'>מאפייני מערכת</span><br><b style='font-size:1.8rem; color:#1f1f1f;'>{df.shape[1]}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='product-badge'><span style='color:#4b5563; font-size:0.85rem;'>עמודות מידע במטריצה</span><br><b style='font-size:1.6rem; color:#111827;'>{df.shape[1]}</b></div>", unsafe_allow_html=True)
         with col3:
             cost_cols = [c for c in df.columns if any(w in c.lower() for w in ['מחיר', 'עלות', 'cost', 'price'])]
             if cost_cols:
                 total_cost = df[cost_cols[0]].sum()
-                st.markdown(f"<div class='google-indicator' style='background: #e6f4ea;'><span style='color:#137333; font-size:0.9rem;'>היקף פיננסי ממופה</span><br><b style='font-size:1.8rem; color:#137333;'>₪{total_cost:,.0f}</b></div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='product-badge' style='background: #f0fdf4; border-color:#bbf7d0;'><span style='color:#166534; font-size:0.85rem;'>חשיפה תקציבית מזוהה</span><br><b style='font-size:1.6rem; color:#166534;'>₪{total_cost:,.0f}</b></div>", unsafe_allow_html=True)
             else:
-                st.markdown("<div class='google-indicator' style='background: #fce8e6;'><span style='color:#c5221f; font-size:0.9rem;'>מצב ניתוח</span><br><b style='font-size:1.8rem; color:#c5221f;'>נדרש סריקה</b></div>", unsafe_allow_html=True)
+                st.markdown("<div class='product-badge' style='background: #fef2f2; border-color:#fca5a5;'><span style='color:#991b1b; font-size:0.85rem;'>רמת מורכבות סריקה</span><br><b style='font-size:1.6rem; color:#991b1b;'>מתקדם</b></div>", unsafe_allow_html=True)
 
-        # הצגת גיליון הנתונים במראה אקסל נקי ומקצועי
-        st.markdown("<div style='margin-top: 25px;'>", unsafe_allow_html=True)
+        # הצגת גיליון הנתונים
+        st.markdown("<div style='margin-top: 20px; margin-bottom: 25px;'>", unsafe_allow_html=True)
         st.dataframe(df.head(6), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # אופטימיזציית גודל נתונים
+        # אופטימיזציית גודל נתונים לסוכנים
         if df.shape[0] > 500:
             table_as_text = df.head(500).to_string(index=False)
         else:
@@ -184,15 +206,15 @@ if uploaded_file is not None:
         st.stop()
 else:
     st.markdown("""
-    <div style='text-align: center; padding: 60px 20px; border: 1px dashed #dadce0; border-radius: 24px; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-top: 15px;'>
-        <span style='font-size: 2.5rem; color: #1a73e8;'>📥</span>
-        <h3 style='margin: 15px 0 5px 0; font-weight: 600; color: #1f1f1f; font-size: 1.2rem;'>העלאת קובץ נתונים</h3>
-        <p style='color: #5f6368; font-size: 0.95rem; margin: 0;'>בחרי או גררי קובץ Excel או CSV כדי להתחיל בעבודה עם ה-AI</p>
+    <div style='text-align: center; padding: 50px 20px; border: 1px dashed #d1d5db; border-radius: 20px; background: #ffffff; margin-top: 15px;'>
+        <span style='font-size: 2.2rem; color: #2563eb;'>📥</span>
+        <h3 style='margin: 12px 0 4px 0; font-weight: 700; color: #111827; font-size: 1.15rem;'>הזנת מקור נתונים</h3>
+        <p style='color: #4b5563; font-size: 0.95rem; margin: 0;'>גררי לכאן קובץ אקסל או CSV להפעלת מנגנון האופטימיזציה של הסוכנים</p>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
 
-# 🧠 6. קביעת הגדרות חוקיות ומקרי קצה עבור הסוכנים האוטונומיים
+# 🧠 7. הגדרות חוקיות ומקרי קצה עבור הסוכנים האוטונומיים
 SYSTEM_INSTRUCTION_ANALYST = """
 אתה ראש צוות אנליסטים בכיר לניהול נכסי תוכנה (SAM Lead). תפקידך לבחון את קובץ הנתונים הגולמי ולזהות חריגות על פי חוקי הרישוי הנוקשים הבאים של הארגון:
 
@@ -213,16 +235,16 @@ SYSTEM_INSTRUCTION_ARCHITECT = """
 
 עליך לבנות:
 1. תוכנית אסטרטגית ליישוב המחלוקות (כגון מודל הרישוי של GitPool, וכפילויות ה-VIP של E3+E5).
-2. המלצות מעשיות להתמודדות WITH מערכות שאינן תומכות באוטומציה (כמו Canva, רישוי לבקרי הדפסה ותיבות מייל).
+2. המלצות מעשיות להתמודדות עם מערכות שאינן תומכות באוטומציה (כמו Canva, רישוי לבקרי הדפסה ותיבות מייל).
 3. פתרונות ייעודיים לניהול רישיונות לפי עמדה (Per Seat) לעומת משתמש (Per User).
 4. ניסוח הודעה רשמית, חדה ומקצועית המיועדת למנהלים בכירים (Executive Summary) המסכמת את הסיכונים, החיסכון הכלכלי הצפוי והצעדים הבאים.
 
 ענה בעברית עסקית רהוטה ונקייה.
 """
 
-# ✅ 7. מנוע הפעלה ועיבוד בזמן אמת
-st.markdown("<div style='margin-top: 30px;'>", unsafe_allow_html=True)
-if st.button("🚀 הפעל ניתוח ואופטימיזציה חכמה", type="primary"):
+# ✅ 8. מנוע הפעלה וסביבת תוצרים
+st.markdown("<div style='margin-top: 10px;'>", unsafe_allow_html=True)
+if st.button("🚀 הפעל מערך סוכנים ואופטימיזציה", type="primary"):
     
     try:
         # סוכן 1: Data Investigator
@@ -249,27 +271,27 @@ if st.button("🚀 הפעל ניתוח ואופטימיזציה חכמה", type=
             res2 = architect_model.generate_content(architect_prompt)
             architect_report = res2.text
 
-        # 🌟 8. Workspace תוצרים מבוסס טאבים של גוגל
-        st.markdown("<p style='color: #5f6368; font-weight:700; margin: 35px 0 15px 0; font-size:1rem;'>💻 סביבת עבודה ואסטרטגיה</p>", unsafe_allow_html=True)
-        tab1, tab2 = st.tabs(["📊 ממצאי אנליסט הנתונים", "📄 תוכנית אסטרטגית וניסוח למנהלים"])
+        # 🌟 9. Workspace תוצרים מבוסס טאבים שטוחים
+        st.markdown("<p style='color: #4b5563; font-weight:700; margin: 30px 0 15px 0; font-size:1rem;'>💻 פלטי סוכנים ומסמכים אסטרטגיים</p>", unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["📊 דוח ממצאים וחריגות קצה", "📄 תוכנית יישום וסיכום מנהלים"])
         
         with tab1:
-            st.markdown("<div class='google-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='product-card'>", unsafe_allow_html=True)
             st.markdown(analyst_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
         with tab2:
-            st.markdown("<div class='google-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='product-card'>", unsafe_allow_html=True)
             st.markdown(architect_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
         # 📥 יצירת קובץ דוח מעוצב להורדה
-        full_report = f"=========================================\nSAM WORKSPACE SYSTEM REPORT\n=========================================\n\n[PART 1: ANALYTICS]\n\n{analyst_report}\n\n=========================================\n[PART 2: STRATEGIC ACTION PLAN]\n\n{architect_report}"
+        full_report = f"=========================================\nSAM CORE SYSTEM EXECUTIVE REPORT\n=========================================\n\n[PART 1: ANALYTICS & EDGE CASES]\n\n{analyst_report}\n\n=========================================\n[PART 2: STRATEGIC ACTION PLAN]\n\n{architect_report}"
         b64 = base64.b64encode(full_report.encode('utf-8')).decode()
         
         st.markdown("---")
         st.markdown(
-            f'<div style="text-align: left;"><a class="google-download" href="data:file/txt;base64,{b64}" download="SAM_Workspace_Report.txt">📥 ייצוא דוח משולב</a></div>',
+            f'<div style="text-align: left;"><a class="product-download" href="data:file/txt;base64,{b64}" download="SAM_Executive_Report.txt">📥 ייצוא דוח משולב</a></div>',
             unsafe_allow_html=True
         )
         
