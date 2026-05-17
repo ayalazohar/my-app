@@ -13,7 +13,7 @@ import streamlit as st
 import pandas as pd
 import base64
 import google.generativeai as genai
-
+import streamlit as st
 # ✅ 1. הגדרות עמוד קריטיות למוצר אפליקטיבי
 st.set_page_config(
     page_title="SAM OS Enterprise", 
