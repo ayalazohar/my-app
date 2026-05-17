@@ -2,131 +2,137 @@ import streamlit as st
 import pandas as pd
 import base64
 import google.generativeai as genai
+import plotly.express as px
 
-# 🎨 הגדרות עיצוב
-st.set_page_config(page_title="License Optimization AI", page_icon="🔍", layout="wide")
+# ✅ הגדרות
+st.set_page_config(page_title="AI License Dashboard", layout="wide")
 
+# 🎨 CSS מתקדם
 st.markdown("""
 <style>
 body {direction: RTL;}
-.stApp {background-color: #0e1117; color: white;}
-.block-container {padding: 2rem; border-radius: 12px; background-color: #161b22;}
-h1, h2, h3 {color: #00cec9;}
+.stApp {
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: #e2e8f0;
+}
+.block-container {
+    padding: 2rem;
+}
+h1 {
+    text-align: center;
+    color: #38bdf8;
+}
+.card {
+    background-color: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
 .stButton button {
-    background-color: #00b894;
+    width: 100%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
     border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 16px;
+    padding: 12px;
+    font-size: 18px;
     font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🔍 מערכת AI לאופטימיזציית רישוי ארגוני")
+# ✅ כותרת
+st.title("📊 מערכת AI לניהול רישוי ארגוני")
 
-st.markdown("📊 העלה קובץ רישוי (Excel / CSV / TXT) לקבלת ניתוח חכם והמלצות")
-
-# 🔐 API רק מ-Secrets
+# 🔐 API
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ לא הוגדר GEMINI_API_KEY ב‑Secrets")
+    st.error("❌ חסר API ב‑Secrets")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# 📁 העלאת קובץ
-uploaded_file = st.file_uploader(
-    "📁 בחר קובץ",
-    type=["xlsx", "xls", "csv", "txt"]
-)
+# 📁 Upload
+st.markdown("### 📁 העלאת קובץ")
 
-# ✅ בדיקה אם אין קובץ
+uploaded_file = st.file_uploader("", type=["xlsx","xls","csv","txt"])
+
 if not uploaded_file:
-    st.warning("⬅️ העלה קובץ כדי להתחיל")
+    st.info("⬅️ העלה קובץ כדי להתחיל")
     st.stop()
 
-# 📊 קריאת קובץ לפי סוג
-try:
-    ext = uploaded_file.name.split(".")[-1].lower()
+# ✅ קריאה
+ext = uploaded_file.name.split(".")[-1]
 
-    if ext in ["xlsx", "xls"]:
-        df = pd.read_excel(uploaded_file)
+if ext in ["xlsx", "xls"]:
+    df = pd.read_excel(uploaded_file)
+elif ext == "csv":
+    df = pd.read_csv(uploaded_file)
+else:
+    df = pd.read_csv(uploaded_file, delimiter=None)
 
-    elif ext == "csv":
-        df = pd.read_csv(uploaded_file)
+# ✅ תצוגה יפה
+col1, col2 = st.columns(2)
 
-    elif ext == "txt":
-        df = pd.read_csv(uploaded_file, delimiter=None)
+with col1:
+    st.markdown("### 📋 נתונים")
+    st.dataframe(df, use_container_width=True)
 
-    else:
-        st.error("❌ פורמט לא נתמך")
-        st.stop()
-
-except Exception as e:
-    st.error(f"❌ שגיאה בקריאת הקובץ: {e}")
-    st.stop()
-
-# ✅ תצוגה
-st.success("✅ הקובץ נטען בהצלחה")
-st.dataframe(df, use_container_width=True)
-
-# ✅ המרה לטקסט
-table_text = df.to_string(index=False)
-
-# 🚀 כפתור ניתוח
-if st.button("🚀 נתח נתונים"):
+with col2:
+    st.markdown("### 📊 סקירה מהירה")
 
     try:
-        # 🧠 Agent 1
-        with st.spinner("🧠 מנתח נתונים..."):
-            res1 = model.generate_content(f"""
-            נתח את טבלת הרישוי הבאה בצורה מקצועית:
-            
-            {table_text}
-            
-            מצא:
-            - כפילויות
-            - רישוי מיותר
-            - חריגות שימוש
-            - חוסר ניצול
-            """)
+        num_cols = df.select_dtypes(include='number').columns
 
-            analyst_report = res1.text
+        if len(num_cols) > 0:
+            chart = px.bar(df, y=num_cols[0])
+            st.plotly_chart(chart, use_container_width=True)
+    except:
+        st.info("אין נתונים מספריים לגרף")
 
-        # 🛠️ Agent 2
-        with st.spinner("🛠️ בונה תוכנית פעולה..."):
-            res2 = model.generate_content(f"""
-            בהתבסס על הדוח הבא, בנה:
-            
-            1. תוכנית אופטימיזציה
-            2. המלצות אופרטיביות
-            3. צעדים לחיסכון כספי
-            4. ניסוח הודעה למנהלים
-            
-            דוח:
-            {analyst_report}
-            """)
+# ✅ טקסט ל-AI
+table_text = df.to_string(index=False)
 
-            architect_report = res2.text
+# 🚀 כפתור
+if st.button("🚀 ניתוח חכם"):
 
-        # 📊 הצגה
-        tab1, tab2 = st.tabs(["📋 ניתוח", "🚀 תוכנית פעולה"])
+    with st.spinner("🧠 מנתח נתונים..."):
 
-        with tab1:
-            st.markdown(analyst_report)
+        res1 = model.generate_content(f"""
+        נתח את הנתונים הבאים:
+        {table_text}
 
-        with tab2:
-            st.markdown(architect_report)
+        מצא:
+        - בזבוזים
+        - כפילויות
+        - חריגות
+        """)
 
-        # 💾 הורדה
-        full_report = f"{analyst_report}\n\n{architect_report}"
-        b64 = base64.b64encode(full_report.encode()).decode()
+        report1 = res1.text
 
-        st.markdown(
-            f'<a href="data:file/txt;base64,{b64}" download="AI_Report.txt">📥 הורד דוח</a>',
-            unsafe_allow_html=True
-        )
+    with st.spinner("🛠️ מייצר המלצות..."):
 
-    except Exception as e:
-        st.error(f"❌ שגיאה בהרצת AI: {e}")
+        res2 = model.generate_content(f"""
+        על בסיס זה בנה תוכנית פעולה:
+        {report1}
+        """)
+
+        report2 = res2.text
+
+    st.markdown("---")
+
+    tab1, tab2 = st.tabs(["📋 ניתוח", "🚀 המלצות"])
+
+    with tab1:
+        st.markdown(f"<div class='card'>{report1}</div>", unsafe_allow_html=True)
+
+    with tab2:
+        st.markdown(f"<div class='card'>{report2}</div>", unsafe_allow_html=True)
+
+    # 💾 הורדה
+    full = report1 + "\n\n" + report2
+    b64 = base64.b64encode(full.encode()).decode()
+
+    st.markdown(
+        f'<a href="data:file/txt;base64,{b64}" download="report.txt">📥 הורד דוח</a>',
+        unsafe_allow_html=True
+    )
