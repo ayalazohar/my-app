@@ -3,104 +3,133 @@ import pandas as pd
 import base64
 import google.generativeai as genai
 
-# ✅ הגדרות עמוד מורחבות
+# ✅ הגדרות עמוד מתקדמות
 st.set_page_config(
-    page_title="Enterprise License Optimization AI", 
-    page_icon="🛡️", 
+    page_title="SAM AI - Advanced Optimization", 
+    page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 🎨 עיצוב מודרני ונקי (יישור לימין, כרטיסים ואפקטים של ריחופים)
+# 🎨 עיצוב עתידני, קליל ומפוצץ (Next-Gen Cyberpunk UI)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&display=swap');
     
+    /* הגדרות בסיס ויישור לימין */
     html, body, [data-testid="stSidebarView"] {
         font-family: 'Assistant', sans-serif;
         direction: RTL;
         text-align: right;
     }
     
+    /* רקע מדורג עמוק ומודרני */
     .stApp {
-        background: linear-gradient(135deg, #0f172a, #1e293b);
-        color: #f8fafc;
+        background: radial-gradient(circle at top right, #0f172a, #020617);
+        color: #f1f5f9;
     }
     
-    /* עיצוב כרטיסים מקצועי */
-    .custom-card {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 24px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* כרטיסי זכוכית עתידניים (Glassmorphism) */
+    .cyber-card {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
-    /* כפתור הנעה לפעולה משודרג */
+    /* אפקט ריחוף מטורף לכרטיסים */
+    .cyber-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.1);
+    }
+    
+    /* כפתור הפעלה סופר-פרימיום עם אנימציית זוהר */
     button[kind="primary"] {
-        background: linear-gradient(135deg, #10b981, #059669) !important;
+        background: linear-gradient(90deg, #10b981, #06b6d4) !important;
         border: none !important;
-        border-radius: 12px !important;
-        color: white !important;
-        font-weight: 600 !important;
-        padding: 0.75rem 2rem !important;
-        transition: all 0.3s ease !important;
+        border-radius: 14px !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        font-size: 18px !important;
+        padding: 0.85rem 2.5rem !important;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease-in-out !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
         width: 100%;
     }
     
     button[kind="primary"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba(6, 182, 212, 0.6) !important;
     }
     
-    /* שיפור מראה הטאבים */
+    /* עיצוב הטאבים המרכזיים */
     .stTabs [data-baseweb="tab"] {
-        font-size: 16px;
-        font-weight: 600;
-        color: #94a3b8;
+        font-size: 18px;
+        font-weight: 700;
+        color: #64748b;
+        padding: 10px 20px;
+        transition: all 0.3s;
     }
     .stTabs [data-baseweb="tab"]:hover {
-        color: #10b981;
+        color: #06b6d4;
     }
     .stTabs [aria-selected="true"] {
         color: #10b981 !important;
-        border-bottom-color: #10b981 !important;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 10px 10px 0 0;
     }
     
-    /* לינק הורדה מעוצב ככפתור משני */
-    .download-btn {
+    /* כפתור הורדה מעוצב כאלמנט פרימיום צידי */
+    .download-cyber {
         display: inline-block;
-        padding: 10px 20px;
-        background-color: #334155;
-        color: #f8fafc !important;
+        padding: 12px 28px;
+        background: transparent;
+        color: #06b6d4 !important;
         text-decoration: none;
-        border-radius: 10px;
-        font-weight: 600;
-        text-align: center;
-        transition: background 0.2s;
-        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        font-weight: 700;
+        border: 2px solid #06b6d4;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
     }
-    .download-btn:hover {
-        background-color: #475569;
+    .download-cyber:hover {
+        background: #06b6d4;
+        color: #020617 !important;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ כותרת המערכת
-st.markdown("<h1 style='text-align: center; color: #10b981;'>🛡️ SAM Agent Platform</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 1.2rem;'>מערכת סוכנים חכמה לאופטימיזציה וניהול נכסי רישוי ארגוניים</p>", unsafe_allow_html=True)
+# ⚡ כותרת ראשית חללית
+st.markdown("""
+<div style='text-align: center; padding: 20px 0;'>
+    <h1 style='font-weight: 800; font-size: 3rem; background: linear-gradient(90deg, #10b981, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        ⚡ SAM NEURAL INTELLIGENCE
+    </h1>
+    <p style='color: #94a3b8; font-size: 1.25rem; font-weight: 300; margin-top: -10px;'>
+        הדור הבא של ניתוח ואופטימיזציית רישוי ארגוני מבוסס סוכנים אוטונומיים
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 st.markdown("---")
 
-# ✅ אימות מפתח API מה-Secrets
+# ✅ בדיקת מפתח API מ-Secrets
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ מפתח API (GEMINI_API_KEY) לא נמצא ב-Secrets של האפליקציה.")
+    st.error("❌ מפתח API (GEMINI_API_KEY) חסר ב-Secrets.")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# ✅ טעינת קובץ והצגת נתונים מהירה
-uploaded_file = st.file_uploader("📁 גררי או בחרי את קובץ הרישוי של הארגון", type=["xlsx", "xls", "csv"])
+# ✅ ממשק העלאת קבצים קליל ונקי
+uploaded_file = st.file_uploader("", type=["xlsx", "xls", "csv"])
 
 if uploaded_file is not None:
     try:
@@ -109,88 +138,90 @@ if uploaded_file is not None:
         else:
             df = pd.read_excel(uploaded_file)
             
-        st.success("✅ הקובץ נטען בהצלחה במערכת")
+        st.success("🎯 הקובץ נקלט בהצלחה במערכת. המידע מוכן לעיבוד.")
         
-        # 📊 תצוגת מדדים מהירה (Metrics) המבוססת על הקובץ שהועלה
+        # 📊 כרטיסי מדדים (Metrics) מעוצבים וקלילים
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric(label="סה\"כ שורות נתונים", value=f"{df.shape[0]:,}")
+            st.metric(label="📊 שורות נתונים", value=f"{df.shape[0]:,}")
         with col2:
-            st.metric(label="עמודות שזוהו", value=df.shape[1])
+            st.metric(label="⚙️ פרמטרים שנמצאו", value=df.shape[1])
         with col3:
-            # ניסיון חילוץ עמודה פיננסית אם קיימת, לטובת מראה יוקרתי
-            cost_cols = [c for c in df.columns if 'מחיר' in c or 'עלות' in c or 'cost' in c.lower() or 'price' in c.lower()]
+            cost_cols = [c for c in df.columns if any(w in c.lower() for w in ['מחיר', 'עלות', 'cost', 'price'])]
             if cost_cols:
                 total_cost = df[cost_cols[0]].sum()
-                st.metric(label="סך תקציב נומינלי מזוהה", value=f"₪{total_cost:,.2f}")
+                st.metric(label="💰 היקף פיננסי מזוהה", value=f"₪{total_cost:,.0f}")
             else:
-                st.metric(label="סטטוס קובץ", value="תקין וממתין לניתוח")
+                st.metric(label="🛡️ רמת מורכבות קובץ", value="גבוהה (מומלץ לניתוח)")
 
-        # הצגת הצצה לנתונים בתוך קונטיינר מעוצב
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
-        st.markdown("### 📋 הצצה לנתוני הגלם (10 שורות ראשונות)")
-        st.dataframe(df.head(10), use_container_width=True)
+        # תצוגת נתונים בתוך קארד זכוכית
+        st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #06b6d4; margin-top:0;'>🔍 סקירה מהירה של נתוני המקור</h4>", unsafe_allow_html=True)
+        st.dataframe(df.head(8), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
         table_as_text = df.to_string(index=False)
 
     except Exception as e:
-        st.error(f"שגיאה בקריאת הקובץ: {e}")
+        st.error(f"שגיאה בטעינת הקובץ: {e}")
         st.stop()
 else:
-    st.info("⬅️ אנא העלי קובץ נתונים (CSV או Excel) כדי להפעיל את סוכני ה-AI.")
+    st.markdown("""
+    <div style='text-align: center; padding: 40px; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; background: rgba(255,255,255,0.02);'>
+        <p style='color: #64748b; font-size: 1.1rem; margin: 0;'>גררי לכאן קובץ אקסל או CSV כדי להזניק את סוכני ה-AI</p>
+    </div>
+    """, unsafe_allow_html=True)
     st.stop()
 
-# ✅ הפעלת מערכת הסוכנים
-st.markdown("### 🤖 הפעלת ארכיטקטורת הסוכנים")
-if st.button("🚀 הפעל סוכני ניתוח ואסטרטגיה", type="primary"):
+# ✅ אזור הפעלת הסוכנים
+st.markdown("<div style='margin: 30px 0;'>", unsafe_allow_html=True)
+if st.button("⚡ הזרק ניתוח ואופטימיזציה בזמן אמת", type="primary"):
     
-    # 🕵️‍♂️ סוכן 1 - אנליסט הנתונים החוקר
-    # שימוש ב-system_instruction כדי לקבע את ההתנהגות המקצועית שלו
+    # 🕵️‍♂️ סוכן 1: Data Investigator
     analyst_model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
-        system_instruction="אתה אנליסט בכיר לניהול נכסי תוכנה (SAM Expert). תפקידך לנתח קבצי נתונים, למצוא חריגות, כפילויות, רישיונות שלא בשימוש, וסיכוני תאימות משפטית או כלכלית. ענה בעברית מקצועית, והשתמש בטבלאות Markdown ובכותרות ברורות."
+        system_instruction="אתה אנליסט סייבר ו-SAM בכיר. תפקידך לחשוף חוסר יעילות, כפילויות רישוי, סיכוני תאימות ובזבוז תקציבי. הצג את הממצאים שלך בצורה חדה, נקייה, מבוססת טבלאות Markdown ונקודות מפתח ברורות בעברית מקצועית."
     )
     
-    analyst_prompt = f"להלן נתוני הרישוי הגולמיים של הארגון. בצע ניתוח מעמיק והפק דוח ממצאים מפורט:\n\n{table_as_text}"
+    analyst_prompt = f"בצע ניתוח נוירולוגי מעמיק על נתוני הרישוי הבאים ומצא חריגות:\n\n{table_as_text}"
     
-    with st.spinner("🕵️‍♂️ סוכן 1: אנליסט הנתונים סורק את הקובץ ומאתר חריגות..."):
+    with st.spinner("🧠 סוכן 1 (Data Analyst) מפצח את מבנה הנתונים..."):
         res1 = analyst_model.generate_content(analyst_prompt)
         analyst_report = res1.text
 
-    # 🛠️ סוכן 2 - הארכיטקט האסטרטגי
-    # הסוכן השני מקבל את הפלט של הראשון ומסיק ממנו מסקנות ניהוליות
+    # 🛠️ סוכן 2: Strategic Architect
     architect_model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
-        system_instruction="אתה ארכיטקט מערכות ומנהל טכנולוגיות בכיר (CTO). תפקידך לקחת דוחות אנליטיים גולמיים ולהפוך אותם לתוכנית עבודה אסטרטגית, המלצות פיננסיות ברורות לחיסכון, וטקסט מוכן להצגה להנהלה הבכירה (Executive Summary). ענה בעברית עסקית רהוטה."
+        system_instruction="אתה ארכיטקט מערכות פיננסיות ו-CTO. תפקידך לקחת ממצאים גולמיים של אנליסט ולהפוך אותם לתוכנית פעולה אסטרטגית מטורפת, דרכים מהירות לחיסכון במשאבים (Quick Wins), וניסוח סיכום בכירים יוקרתי להנהלה. ענה בעברית עסקית רהוטה ונקייה."
     )
     
-    architect_prompt = f"בהתבסס על דוח הממצאים של האנליסט, בנה תוכנית פעולה אסטרטגית, המלצות לחיסכון מעשי, וניסוח סיכום מנהלים רשמי:\n\n{analyst_report}"
+    architect_prompt = f"על בסיס הדוח הבא, גבש אסטרטגיית פעולה יישומית וסיכום מנהלים:\n\n{analyst_report}"
     
-    with st.spinner("🛠️ סוכן 2: הארכיטקט האסטרטגי מגבש תוכנית פעולה והמלצות פיננסיות..."):
+    with st.spinner("🚀 סוכן 2 (Strategic Architect) מייצר תוכנית אופטימיזציה פיננסית..."):
         res2 = architect_model.generate_content(architect_prompt)
         architect_report = res2.text
 
-    # 🌟 הצגת התוצרים בצורה היררכית ומקצועית (Tabs)
-    st.markdown("### 📊 תוצרי המערכת")
-    tab1, tab2 = st.tabs(["📋 דוח אנליסט (ממצאים וחריגות)", "🎯 תוכנית אסטרטגית (המלצות ומנהלים)"])
+    # 🌟 הצגת התוצרים בטאבים עתידניים
+    st.markdown("### 📊 תוצרי עיבוד הסוכנים")
+    tab1, tab2 = st.tabs(["🎯 ממצאי אנליסט הנתונים", "💎 תוכנית אסטרטגית ומנהלים"])
     
     with tab1:
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
         st.markdown(analyst_report)
         st.markdown("</div>", unsafe_allow_html=True)
         
     with tab2:
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
         st.markdown(architect_report)
         st.markdown("</div>", unsafe_allow_html=True)
         
-    # 📥 יצירת קובץ דוח מאוחד להורדה
-    full_report = f"=========================================\nENTERPRISE LICENSE OPTIMIZATION REPORT\n=========================================\n\n[PART 1: ANALYST REPORT]\n\n{analyst_report}\n\n=========================================\n[PART 2: STRATEGIC ACTION PLAN]\n\n{architect_report}"
+    # 📥 יצירת קובץ דוח מעוצב להורדה
+    full_report = f"=========================================\nSAM NEURAL INTELLIGENCE REPORT\n=========================================\n\n[PART 1: DEEP ANALYTICS]\n\n{analyst_report}\n\n=========================================\n[PART 2: STRATEGIC ACTION PLAN]\n\n{architect_report}"
     b64 = base64.b64encode(full_report.encode('utf-8')).decode()
     
     st.markdown("---")
     st.markdown(
-        f'<div style="text-align: left;"><a class="download-btn" href="data:file/txt;base64,{b64}" download="License_Optimization_Report.txt">📥 הורדת הדוח המלא (TXT)</a></div>',
+        f'<div style="text-align: left;"><a class="download-cyber" href="data:file/txt;base64,{b64}" download="SAM_Intelligence_Report.txt">📥 ייצוא דוח מלא ומסוכם</a></div>',
         unsafe_allow_html=True
     )
+st.markdown("</div>", unsafe_allow_html=True)
