@@ -299,3 +299,5 @@ if st.button("🚀 הפעל מערך סוכנים ואופטימיזציה", typ
         st.error(f"❌ שגיאת רשת במערכת ה-AI: {api_error}")
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+```
