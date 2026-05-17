@@ -180,4 +180,3 @@ if st.button("🚀 הפעל ניתוח"):
         st.markdown("### 🚀 המלצות")
         st.markdown(strategy)
         st.markdown("</div>", unsafe_allow_html=True)
-``
