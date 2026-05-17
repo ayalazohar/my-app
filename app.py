@@ -1,178 +1,142 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import google.generativeai as genai
 
 # ✅ CONFIG
-st.set_page_config(page_title="License AI", layout="wide")
+st.set_page_config(page_title="License AI Copilot", layout="wide")
 
-# ✅ DESIGN SYSTEM (מודרני נקי)
+# 🎨 UI מודרני (כמו ChatGPT)
 st.markdown("""
 <style>
 body {direction: RTL;}
+
 .stApp {
-    background: linear-gradient(135deg,#020617,#0f172a);
-    color:#e5e7eb;
+    background: #0f172a;
+    color: #e2e8f0;
 }
 
-/* HERO */
-.hero {
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    height:85vh;
+/* Chat container */
+.chat-box {
+    max-width: 800px;
+    margin: auto;
+}
+
+/* Messages */
+.user-msg {
+    background: #2563eb;
+    padding: 12px 16px;
+    border-radius: 14px;
+    margin: 10px 0;
+    color: white;
+    align-self: flex-end;
+}
+
+.ai-msg {
+    background: #1e293b;
+    padding: 12px 16px;
+    border-radius: 14px;
+    margin: 10px 0;
+}
+
+/* Header */
+.header {
     text-align:center;
+    margin-bottom:20px;
 }
-
-.hero-title {
-    font-size:56px;
-    font-weight:800;
-    background: linear-gradient(90deg,#22c55e,#3b82f6);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+.header-title {
+    font-size:32px;
+    font-weight:700;
 }
-
-.hero-sub {
-    font-size:18px;
-    color:#9ca3af;
-    margin-top:10px;
-    margin-bottom:30px;
-}
-
-/* CARD */
-.card {
-    background:#111827;
-    padding:20px;
-    border-radius:14px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-/* KPI */
-.kpi {
-    background: linear-gradient(135deg,#2563eb,#6366f1);
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
-    color:white;
-}
-
-/* BUTTON */
-button[kind="primary"] {
-    background: linear-gradient(135deg,#22c55e,#16a34a);
-    border-radius:10px;
-    height:50px;
-    font-size:16px;
+.header-sub {
+    color:#94a3b8;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ API
+# 🔐 API
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ אין API KEY")
+    st.error("Missing API key")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# ✅ HERO + UPLOAD במרכז
-uploaded_file = st.file_uploader("", type=["xlsx","csv","txt"])
-
-if not uploaded_file:
-
-    st.markdown("""
-    <div class="hero">
-        <div class="hero-title">License Intelligence</div>
-
-        <div class="hero-sub">
-        מערכת AI לניהול ואופטימיזציה של רישוי ארגוני
-        </div>
-
-        <div class="card" style="width:350px;">
-            📁 גרור קובץ או לחץ להעלאה
-            <br><br>
-            <small style="color:#9ca3af;">
-            Excel / CSV נתמכים
-            </small>
-        </div>
-
-        <div style="margin-top:30px; color:#6b7280;">
-        🔍 זיהוי כפילויות · 📉 חיסכון · ⚡ ניתוח מהיר
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.stop()
-
-# ✅ LOAD DATA
-try:
-    if uploaded_file.name.endswith("xlsx"):
-        df = pd.read_excel(uploaded_file)
-    else:
-        df = pd.read_csv(uploaded_file)
-except Exception as e:
-    st.error(f"שגיאה בקריאת קובץ: {e}")
-    st.stop()
-
 # ✅ HEADER
-st.markdown("## 📊 Dashboard")
+st.markdown("""
+<div class="header">
+    <div class="header-title">🤖 License AI Copilot</div>
+    <div class="header-sub">ניתוח רישוי ארגוני באמצעות AI</div>
+</div>
+""", unsafe_allow_html=True)
 
-# ✅ KPI
-col1, col2, col3, col4 = st.columns(4)
+# ✅ Session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-col1.markdown(f"<div class='kpi'>📦 רשומות<br><h2>{len(df)}</h2></div>", unsafe_allow_html=True)
+if "df" not in st.session_state:
+    st.session_state.df = None
 
-num_cols = df.select_dtypes(include='number').columns
+# ✅ Upload
+uploaded_file = st.file_uploader("📁 העלה קובץ רישוי", type=["csv", "xlsx"])
 
-if len(num_cols) > 0:
-    col2.markdown(f"<div class='kpi'>💰 סה\"כ<br><h2>{int(df[num_cols[0]].sum())}</h2></div>", unsafe_allow_html=True)
-    col3.markdown(f"<div class='kpi'>📈 ממוצע<br><h2>{round(df[num_cols[0]].mean(),2)}</h2></div>", unsafe_allow_html=True)
-    col4.markdown(f"<div class='kpi'>⚠️ חריגות<br><h2>{(df[num_cols[0]] > df[num_cols[0]].mean()).sum()}</h2></div>", unsafe_allow_html=True)
+if uploaded_file:
+    if uploaded_file.name.endswith("xlsx"):
+        st.session_state.df = pd.read_excel(uploaded_file)
+    else:
+        st.session_state.df = pd.read_csv(uploaded_file)
 
-# ✅ LAYOUT
-left, right = st.columns([2,1])
+    st.success("✅ קובץ נטען")
 
-# ✅ TABLE
-with left:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("### 📋 נתונים")
-    st.dataframe(df, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+# ✅ Chat UI
+st.markdown('<div class="chat-box">', unsafe_allow_html=True)
 
-# ✅ CHART
-with right:
-    if len(num_cols) > 0:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 📊 גרף")
-        fig = px.bar(df, y=num_cols[0])
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f"<div class='user-msg'>{msg['content']}</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='ai-msg'>{msg['content']}</div>", unsafe_allow_html=True)
 
-# ✅ AI SECTION
-st.markdown("## 🤖 AI Insights")
+st.markdown('</div>', unsafe_allow_html=True)
 
-if st.button("🚀 הפעל ניתוח"):
+# ✅ Input
+user_input = st.text_input("שאל משהו על הרישוי...")
 
-    text = df.to_string(index=False)
+if user_input:
 
-    with st.spinner("🧠 מנתח נתונים..."):
-        res1 = model.generate_content(f"נתח את הנתונים:\n{text}")
-        analysis = res1.text
+    # שמירת הודעת משתמש
+    st.session_state.messages.append({
+        "role": "user",
+        "content": user_input
+    })
 
-    with st.spinner("🛠️ מייצר המלצות..."):
-        res2 = model.generate_content(f"תן תוכנית פעולה:\n{analysis}")
-        strategy = res2.text
+    # ✅ AI answer
+    if st.session_state.df is not None:
 
-    colA, colB = st.columns(2)
+        data_text = st.session_state.df.to_string(index=False)
 
-    with colA:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 📋 ניתוח")
-        st.markdown(analysis)
-        st.markdown("</div>", unsafe_allow_html=True)
+        prompt = f"""
+        אתה מומחה לניהול רישוי ארגוני.
+        יש לך את הנתונים הבאים:
 
-    with colB:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🚀 המלצות")
-        st.markdown(strategy)
-        st.markdown("</div>", unsafe_allow_html=True)
+        {data_text}
+
+        שאלה:
+        {user_input}
+
+        תן תשובה חכמה מקצועית.
+        """
+
+    else:
+        prompt = user_input
+
+    with st.spinner("חושב..."):
+        response = model.generate_content(prompt)
+        answer = response.text
+
+    # שמירת תשובת AI
+    st.session_state.messages.append({
+        "role": "ai",
+        "content": answer
+    })
+
+    st.rerun()
