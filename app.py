@@ -3,18 +3,18 @@ import pandas as pd
 import base64
 import google.generativeai as genai
 
-# ✅ 1. הגדרות עמוד קריטיות למוצר אפליקטיבי
+# ✅ 1. הגדרות מסך רחב לטובת פריסת נתונים מקסימלית (BI View)
 st.set_page_config(
-    page_title="SAM OS Enterprise", 
-    page_icon="🛡️", 
+    page_title="SAM BI — Analytics Engine", 
+    page_icon="📊", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 🎨 2. ארכיטקטורת עיצוב פרימיום (Material Design Pro Workspace)
+# 🎨 2. ארכיטקטורת עיצוב של לוח מחוונים אנליטי (Data-Dense Dashboard Style)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Assistant:wght@300;400;600;700;800&display=swap');
     
     html, body, [data-testid="stSidebarView"] {
         font-family: 'Assistant', sans-serif;
@@ -22,127 +22,128 @@ st.markdown("""
         text-align: right;
     }
     
-    /* רקע אפליקטיבי פרימיום בהיר ונקי */
+    /* רקע כהה הנדסי מעודן למניעת עייפות עין */
     .stApp {
-        background: #f3f4f6;
-        color: #111827;
+        background: #0f172a;
+        color: #f8fafc;
     }
     
-    /* עיצוב סרגל הצד כמערכת ניווט של אפליקציה */
+    /* סרגל ניווט שמאלי קשיח ומקצועי */
     [data-testid="stSidebar"] {
-        background-color: #ffffff !important;
-        border-left: 1px solid #e5e7eb !important;
-        box-shadow: 2px 0 20px rgba(0,0,0,0.02) !important;
+        background-color: #0b0f19 !important;
+        border-left: 1px solid #1e293b !important;
     }
     
-    /* כרטיסי מוצר פרימיום חלקים */
-    .product-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 20px;
-        padding: 24px;
+    /* קוביות מדדים וגרפים (BI Widgets) */
+    .bi-widget {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
     
-    .product-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+    /* כותרות קטנות וממוקדות למדדים */
+    .widget-label {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    /* פאנל אינדיקטורים מהיר */
-    .product-badge {
-        background: #f9fafb;
-        border: 1px solid #f3f4f6;
-        border-radius: 16px;
-        padding: 16px 20px;
-        text-align: right;
+    /* תצוגת מספרים הנדסית */
+    .widget-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-top: 5px;
     }
     
-    /* כפתור הפעלה רחב ומעוגל של אפליקציות ענן */
+    /* כפתור הפעלה טכני בולט */
     button[kind="primary"] {
-        background: #2563eb !important;
-        border: none !important;
-        border-radius: 12px !important;
+        background: #3b82f6 !important;
+        border: 1px solid #2563eb !important;
+        border-radius: 8px !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 16px !important;
-        padding: 0.85rem 2.5rem !important;
+        font-size: 15px !important;
+        padding: 0.75rem 2rem !important;
         transition: all 0.2s ease-in-out !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
         width: 100%;
     }
     
     button[kind="primary"]:hover {
-        background: #1d4ed8 !important;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
+        background: #2563eb !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4) !important;
     }
     
-    /* טאבים שטוחים של מוצרי SaaS */
+    /* טאבים בסגנון פאנל דוחות */
     .stTabs [data-baseweb="tab"] {
         font-size: 15px;
-        font-weight: 700;
-        color: #4b5563;
-        background: transparent;
-        padding: 12px 24px;
-        transition: color 0.2s;
+        font-weight: 600;
+        color: #64748b;
+        padding: 10px 20px;
+        border-bottom: 2px solid transparent;
     }
     .stTabs [aria-selected="true"] {
-        color: #2563eb !important;
-        border-bottom: 2px solid #2563eb !important;
+        color: #3b82f6 !important;
+        border-bottom: 2px solid #3b82f6 !important;
     }
     
-    /* מראה טבלאות נקי כמו מוצרי ניהול מתקדמים */
+    /* התאמת טבלאות הנתונים למראה נקי של גיליון אלקטרוני */
     [data-testid="stDataFrame"] {
-        background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 12px !important;
-        overflow: hidden;
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
     }
     
-    /* כפתור הורדה ייעודי */
-    .product-download {
+    /* כפתור ייצוא דוח שטוח ומקצועי */
+    .bi-export-btn {
         display: inline-flex;
         align-items: center;
         padding: 10px 24px;
-        background: #ffffff;
-        color: #2563eb !important;
+        background: #0f172a;
+        color: #3b82f6 !important;
         text-decoration: none;
-        border-radius: 12px;
+        border-radius: 8px;
         font-weight: 700;
         font-size: 14px;
-        border: 1px solid #d1d5db;
+        border: 1px solid #334155;
         transition: all 0.2s ease;
     }
-    .product-download:hover {
-        background: #f9fafb;
-        border-color: #2563eb;
+    .bi-export-btn:hover {
+        background: #1e293b;
+        border-color: #3b82f6;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 🏢 3. תפריט ניווט צידי (Sidebar App Navigation)
+# 🏢 3. פאנל בקרה צידי (System Control Sidebar)
 with st.sidebar:
-    st.markdown("<h2 style='color:#111827; font-weight:800; margin-bottom: 5px;'>🛡️ SAM Core</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#6b7280; font-size:0.9rem; margin-top:0;'>פלטפורמת משילות רישוי ארגונית</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#ffffff; font-weight:800; margin-bottom: 5px; font-size:1.4rem;'>📊 SAM BI Engine</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b; font-size:0.85rem; margin-top:0;'>מערכת ניתוח ובקרת משאבים</p>", unsafe_allow_html=True)
     st.markdown("---")
     
-    st.markdown("### ⚙️ מפרט מערכת")
-    st.markdown("<div style='background:#f9fafb; padding:15px; border-radius:12px; border:1px solid #e5e7eb;'>"
-                "<b>סטטוס:</b> <span style='color:#10b981;'>מחובר ומאובטח</span><br>"
-                "<b>מנוע AI:</b> Gemini 2.5 Flash<br>"
-                "<b>ארכיטקטורה:</b> Dual-Agent Pipeline"
+    st.markdown("<p style='color:#94a3b8; font-size:0.85rem; font-weight:600;'>קונפיגורציית סריקה</p>", unsafe_allow_html=True)
+    st.markdown("<div style='background:#1e293b; padding:12px; border-radius:8px; border:1px solid #334155; font-size:0.85rem; color:#cbd5e1;'>"
+                "• <b>מנוע AI:</b> Gemini 2.5 Flash<br>"
+                "• <b>מודל עיבוד:</b> קבצי מבנה (Tabular)<br>"
+                "• <b>רמת ניתוח:</b> Edge-Case Deep Scan"
                 "</div>", unsafe_allow_html=True)
-    
     st.markdown("---")
-    st.markdown("<p style='color:#9ca3af; font-size:0.8rem; text-align:center;'>Enterprise Edition © 2026</p>", unsafe_allow_html=True)
 
-# ⚡ 4. כותרת עבודה ראשית (Workspace Title)
+# ⚡ 4. סרגל כותרת עליון (Top Banner Workspace)
 st.markdown("""
-<div style='background: #ffffff; border: 1px solid #e5e7eb; padding: 24px; border-radius: 20px; margin-bottom: 25px;'>
-    <h1 style='font-weight: 800; font-size: 2rem; margin: 0; color: #111827;'>סביבת עבודה ואופטימיזציה</h1>
-    <p style='color: #4b5563; font-size: 1rem; margin: 5px 0 0 0;'>העלי קובץ נתונים להרצת סוכני ה-AI לזיהוי חריגות, פערי תשתית ומקרי קצה</p>
+<div style='background: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 12px; margin-bottom: 25px;'>
+    <div style='display: flex; justify-content: space-between; align-items: center;'>
+        <div>
+            <h1 style='font-weight: 700; font-size: 1.8rem; margin: 0; color: #ffffff;'>ניהול ותחקור נתוני רישוי</h1>
+            <p style='color: #94a3b8; font-size: 0.95rem; margin: 4px 0 0 0;'>טעינת מטריצות נתונים לעיבוד משולב, איתור חריגות תשתיות ומקרי קצה</p>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -153,7 +154,7 @@ if "GEMINI_API_KEY" not in st.secrets:
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# ✅ 6. סביבת טעינת קבצים אפליקטיבית
+# ✅ 6. ממשק העלאת קבצים קומפקטי
 uploaded_file = st.file_uploader("", type=["xlsx", "xls", "csv"], label_visibility="collapsed")
 
 if uploaded_file is not None:
@@ -163,28 +164,27 @@ if uploaded_file is not None:
         else:
             df = pd.read_excel(uploaded_file)
             
-        st.toast("🎯 זרם הנתונים נקלט וסונכרן במערכת", icon="✅")
+        st.toast("🎯 זרם הנתונים נקלט וסונכרן בהצלחה", icon="✅")
         
-        # 📊 פאנל אינדיקטורים מהיר (Product Dashboard Grid)
+        # 📊 לוח מחוונים ומדדי נתונים (KPI Summary Grid)
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown(f"<div class='product-badge'><span style='color:#4b5563; font-size:0.85rem;'>רשומות ממופות</span><br><b style='font-size:1.6rem; color:#111827;'>{df.shape[0]:,}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='bi-widget'><div class='widget-label'>שורות מידע במטריצה</div><div class='widget-value'>{df.shape[0]:,}</div></div>", unsafe_allow_html=True)
         with col2:
-            st.markdown(f"<div class='product-badge'><span style='color:#4b5563; font-size:0.85rem;'>עמודות מידע במטריצה</span><br><b style='font-size:1.6rem; color:#111827;'>{df.shape[1]}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='bi-widget'><div class='widget-label'>פרמטרים ממופים (Columns)</div><div class='widget-value'>{df.shape[1]}</div></div>", unsafe_allow_html=True)
         with col3:
             cost_cols = [c for c in df.columns if any(w in c.lower() for w in ['מחיר', 'עלות', 'cost', 'price'])]
             if cost_cols:
                 total_cost = df[cost_cols[0]].sum()
-                st.markdown(f"<div class='product-badge' style='background: #f0fdf4; border-color:#bbf7d0;'><span style='color:#166534; font-size:0.85rem;'>חשיפה תקציבית מזוהה</span><br><b style='font-size:1.6rem; color:#166534;'>₪{total_cost:,.0f}</b></div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='bi-widget' style='border-color: #22c55e;'><div class='widget-label' style='color:#22c55e;'>חשיפה תקציבית נומינלית</div><div class='widget-value' style='color:#22c55e;'>₪{total_cost:,.0f}</div></div>", unsafe_allow_html=True)
             else:
-                st.markdown("<div class='product-badge' style='background: #fef2f2; border-color:#fca5a5;'><span style='color:#991b1b; font-size:0.85rem;'>רמת מורכבות סריקה</span><br><b style='font-size:1.6rem; color:#991b1b;'>מתקדם</b></div>", unsafe_allow_html=True)
+                st.markdown("<div class='bi-widget' style='border-color: #eab308;'><div class='widget-label' style='color:#eab308;'>רמת רגישות הנתונים</div><div class='widget-value' style='color:#eab308;'>מרובת קצוות</div></div>", unsafe_allow_html=True)
 
-        # הצגת גיליון הנתונים
-        st.markdown("<div style='margin-top: 20px; margin-bottom: 25px;'>", unsafe_allow_html=True)
-        st.dataframe(df.head(6), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        # הצגת גיליון הנתונים במראה אנליטי נקי
+        st.markdown("<p style='color: #94a3b8; font-size:0.9rem; font-weight:600; margin-bottom:10px;'>📊 תצוגת נתוני מקור גולמיים</p>", unsafe_allow_html=True)
+        st.dataframe(df.head(8), use_container_width=True)
         
-        # אופטימיזציית גודל נתונים לסוכנים
+        # אופטימיזציית נפח טקסט עבור הסוכנים
         if df.shape[0] > 500:
             table_as_text = df.head(500).to_string(index=False)
         else:
@@ -195,10 +195,10 @@ if uploaded_file is not None:
         st.stop()
 else:
     st.markdown("""
-    <div style='text-align: center; padding: 50px 20px; border: 1px dashed #d1d5db; border-radius: 20px; background: #ffffff; margin-top: 15px;'>
-        <span style='font-size: 2.2rem; color: #2563eb;'>📥</span>
-        <h3 style='margin: 12px 0 4px 0; font-weight: 700; color: #111827; font-size: 1.15rem;'>הזנת מקור נתונים</h3>
-        <p style='color: #4b5563; font-size: 0.95rem; margin: 0;'>גררי לכאן קובץ אקסל או CSV להפעלת מנגנון האופטימיזציה של הסוכנים</p>
+    <div style='text-align: center; padding: 45px 20px; border: 1px dashed #334155; border-radius: 12px; background: #1e293b; margin-top: 15px;'>
+        <span style='font-size: 2rem; color: #3b82f6;'>📥</span>
+        <h3 style='margin: 10px 0 5px 0; font-weight: 700; color: #ffffff; font-size: 1.1rem;'>הזנת קובץ נתונים</h3>
+        <p style='color: #94a3b8; font-size: 0.9rem; margin: 0;'>גררי לכאן קובץ אקסל או CSV להפעלת מנגנון האופטימיזציה של הסוכנים</p>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
@@ -233,7 +233,7 @@ SYSTEM_INSTRUCTION_ARCHITECT = """
 
 # ✅ 8. מנוע הפעלה וסביבת תוצרים
 st.markdown("<div style='margin-top: 10px;'>", unsafe_allow_html=True)
-if st.button("🚀 הפעל מערך סוכנים ואופטימיזציה", type="primary"):
+if st.button("🚀 הרץ עיבוד ואופטימיזציית סוכנים", type="primary"):
     
     try:
         # סוכן 1: Data Investigator
@@ -244,7 +244,7 @@ if st.button("🚀 הפעל מערך סוכנים ואופטימיזציה", typ
         
         analyst_prompt = f"להלן נתוני הרישוי הארגוניים של החברה. בצע סריקה קפדנית והפק דוח חריגות ומקרי קצה מלא:\n\n{table_as_text}"
         
-        with st.spinner("🧠 סוכן האנליסט מעבד נתוני מקרי קצה ותשתיות..."):
+        with st.spinner("🤖 סוכן 1 (Data Investigator) מעבד נתוני מטריצה..."):
             res1 = analyst_model.generate_content(analyst_prompt)
             analyst_report = res1.text
 
@@ -256,35 +256,35 @@ if st.button("🚀 הפעל מערך סוכנים ואופטימיזציה", typ
         
         architect_prompt = f"על בסיס דוח הממצאים המורכב ומקרי הקצה שמופו, גבש אסטרטגיית פעולה יישומית וסיכום מנהלים בכיר:\n\n{analyst_report}"
         
-        with st.spinner("⚙️ סוכן הארכיטקט מגבש המלצות פיננסיות וסיכום בכירים..."):
+        with st.spinner("⚙️ סוכן 2 (Strategic Architect) גוזר המלצות אופטימיזציה..."):
             res2 = architect_model.generate_content(architect_prompt)
             architect_report = res2.text
 
-        # 🌟 9. Workspace תוצרים מבוסס טאבים שטוחים
-        st.markdown("<p style='color: #4b5563; font-weight:700; margin: 30px 0 15px 0; font-size:1rem;'>💻 פלטי סוכנים ומסמכים אסטרטגיים</p>", unsafe_allow_html=True)
-        tab1, tab2 = st.tabs(["📊 דוח ממצאים וחריגות קצה", "📄 תוכנית יישום וסיכום מנהלים"])
+        # 🌟 9. פלט דוחות וטאבים בסגנון פאנל אנליטי
+        st.markdown("<p style='color: #94a3b8; font-weight:700; margin: 30px 0 15px 0; font-size:0.95rem;'>💻 דוחות וסיכומי מנהלים מבוססי AI</p>", unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["📊 דוח ממצאים וחריגות קצה", "📋 תוכנית יישום וסיכום מנהלים"])
         
         with tab1:
-            st.markdown("<div class='product-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='bi-widget'>", unsafe_allow_html=True)
             st.markdown(analyst_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
         with tab2:
-            st.markdown("<div class='product-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='bi-widget'>", unsafe_allow_html=True)
             st.markdown(architect_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
         # 📥 יצירת קובץ דוח מעוצב להורדה
-        full_report = f"=========================================\nSAM CORE SYSTEM EXECUTIVE REPORT\n=========================================\n\n[PART 1: ANALYTICS & EDGE CASES]\n\n{analyst_report}\n\n=========================================\n[PART 2: STRATEGIC ACTION PLAN]\n\n{architect_report}"
+        full_report = f"=========================================\nSAM BI ANALYTICS REPORT\n=========================================\n\n[PART 1: DATA ANALYTICS & EDGE CASES]\n\n{analyst_report}\n\n=========================================\n[PART 2: CTO STRATEGIC PLAN]\n\n{architect_report}"
         b64 = base64.b64encode(full_report.encode('utf-8')).decode()
         
         st.markdown("---")
         st.markdown(
-            f'<div style="text-align: left;"><a class="product-download" href="data:file/txt;base64,{b64}" download="SAM_Executive_Report.txt">📥 ייצוא דוח משולב</a></div>',
+            f'<div style="text-align: left;"><a class="bi-export-btn" href="data:file/txt;base64,{b64}" download="SAM_BI_Executive_Report.txt">📥 ייצוא דוח משולב (TXT)</a></div>',
             unsafe_allow_html=True
         )
         
     except Exception as api_error:
-        st.error(f"❌ שגיאת רשת במערכת ה-AI: {api_error}")
+        st.error(f"❌ שגיאת תקשורת ברשת ה-AI: {api_error}")
 
 st.markdown("</div>", unsafe_allow_html=True)
