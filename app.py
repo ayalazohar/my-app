@@ -3,124 +3,137 @@ import pandas as pd
 import base64
 import google.generativeai as genai
 
-# ✅ 1. הגדרות עמוד מתקדמות (UI/UX)
+# ✅ 1. הגדרות מערכת מתקדמות
 st.set_page_config(
-    page_title="SAM AI - Enterprise License Governance", 
+    page_title="SAM OS — Neural Governance", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 🎨 2. עיצוב עתידני, קליל ומפוצץ (Next-Gen Cyberpunk UI)
+# 🎨 2. ארכיטקטורת עיצוב פרימיום (SaaS Next-Gen UI)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Assistant:wght@300;400;600;800&display=swap');
     
     html, body, [data-testid="stSidebarView"] {
-        font-family: 'Assistant', sans-serif;
+        font-family: 'Assistant', 'Plus Jakarta Sans', sans-serif;
         direction: RTL;
         text-align: right;
     }
     
+    /* רקע קוונטי עמוק */
     .stApp {
-        background: radial-gradient(circle at top right, #0f172a, #020617);
-        color: #f1f5f9;
+        background: radial-gradient(140% 100% at top right, #090d16 0%, #05070c 50%, #020305 100%);
+        color: #f8fafc;
     }
     
-    /* כרטיסי זכוכית עתידניים (Glassmorphism) */
-    .cyber-card {
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* מכולות זכוכית מעוגלות (Glassmorphism Pro) */
+    .app-card {
+        background: rgba(13, 20, 35, 0.45);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
-    .cyber-card:hover {
-        transform: translateY(-5px);
-        border-color: rgba(16, 185, 129, 0.3);
-        box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.1);
+    .app-card:hover {
+        transform: translateY(-4px) scale(1.005);
+        border-color: rgba(6, 182, 212, 0.2);
+        box-shadow: 0 30px 60px -20px rgba(6, 182, 212, 0.15);
     }
     
-    /* כפתור הפעלה סופר-פרימיום עם אנימציית זוהר */
+    /* מדדים מהירים בעיצוב אפליקטיבי */
+    .metric-box {
+        border-right: 4px solid #06b6d4;
+        padding-right: 15px;
+        margin: 10px 0;
+    }
+    
+    /* כפתור הפעלה ראשי הולוגרפי */
     button[kind="primary"] {
-        background: linear-gradient(90deg, #10b981, #06b6d4) !important;
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
         border: none !important;
-        border-radius: 14px !important;
-        color: #ffffff !important;
+        border-radius: 16px !important;
+        color: #020617 !important;
         font-weight: 800 !important;
         font-size: 18px !important;
-        padding: 0.85rem 2.5rem !important;
-        transition: all 0.3s ease-in-out !important;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+        padding: 1rem 2.5rem !important;
+        cursor: pointer;
+        transition: all 0.4s ease !important;
+        box-shadow: 0 0 30px rgba(79, 172, 254, 0.3) !important;
         width: 100%;
     }
     
     button[kind="primary"]:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 25px rgba(6, 182, 212, 0.6) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 0 40px rgba(0, 242, 254, 0.6) !important;
     }
     
-    /* עיצוב הטאבים المרכזיים */
+    /* טאבים בסגנון תפריט אפליקציה */
     .stTabs [data-baseweb="tab"] {
-        font-size: 18px;
-        font-weight: 700;
+        font-size: 16px;
+        font-weight: 600;
         color: #64748b;
-        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 10px 24px;
+        margin-left: 8px;
+        border: 1px solid transparent;
+        transition: all 0.3s;
     }
     .stTabs [aria-selected="true"] {
-        color: #10b981 !important;
-        background: rgba(16, 185, 129, 0.1);
-        border-radius: 10px 10px 0 0;
+        color: #00f2fe !important;
+        background: rgba(0, 242, 254, 0.08) !important;
+        border-color: rgba(0, 242, 254, 0.2) !important;
     }
     
-    /* כפתור הורדה מעוצב כאלמנט פרימיום צידי */
-    .download-cyber {
-        display: inline-block;
-        padding: 12px 28px;
-        background: transparent;
-        color: #06b6d4 !important;
+    /* כפתור הורדה מעוצב כפתור משני יוקרתי */
+    .download-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 32px;
+        background: rgba(255, 255, 255, 0.03);
+        color: #f8fafc !important;
         text-decoration: none;
-        border-radius: 12px;
+        border-radius: 14px;
         font-weight: 700;
-        border: 2px solid #06b6d4;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         transition: all 0.3s ease;
     }
-    .download-cyber:hover {
-        background: #06b6d4;
-        color: #020617 !important;
-        box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    .download-action:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #00f2fe;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ⚡ 3. כותרת ראשית חללית
+# ⚡ 3. כותרת ומבנה עליון (App Header)
 st.markdown("""
-<div style='text-align: center; padding: 20px 0;'>
-    <h1 style='font-weight: 800; font-size: 3rem; background: linear-gradient(90deg, #10b981, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-        ⚡ SAM NEURAL INTELLIGENCE
-    </h1>
-    <p style='color: #94a3b8; font-size: 1.25rem; font-weight: 300; margin-top: -10px;'>
-        ניהול ואופטימיזציית רישוי ארגוני מתקדמת כולל חוקיות מקרי קצה ומדיניות מורכבת
-    </p>
+<div style='display: flex; justify-content: space-between; align-items: center; padding: 15px 0; margin-bottom: 30px;'>
+    <div>
+        <span style='background: rgba(0, 242, 254, 0.1); color: #00f2fe; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; letter-spacing: 1px;'>AGENTIC PLATFORM v2.5</span>
+        <h1 style='font-weight: 800; font-size: 2.8rem; margin: 10px 0 5px 0; background: linear-gradient(90deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>SAM OS</h1>
+        <p style='color: #64748b; font-size: 1.1rem; margin: 0;'>ניהול חוקיות רישוי ומקרי קצה בארכיטקטורת סוכנים נוירולוגית</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
-
-# ✅ 4. אימות מפתח API וקונפיגורציה
+# ✅ 4. אימות קונפיגורציית AI
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ מפתח API (GEMINI_API_KEY) חסר ב-Secrets.")
+    st.error("❌ מפתח API (GEMINI_API_KEY) חסר ב-Secrets הארגוניים.")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# ✅ 5. ממשק טעינת קבצים קליל ונקי
-uploaded_file = st.file_uploader("", type=["xlsx", "xls", "csv"])
+# ✅ 5. אזור העלאה קומפקטי ואפליקטיבי
+uploaded_file = st.file_uploader("", type=["xlsx", "xls", "csv"], label_visibility="collapsed")
 
 if uploaded_file is not None:
     try:
@@ -129,47 +142,48 @@ if uploaded_file is not None:
         else:
             df = pd.read_excel(uploaded_file)
             
-        st.success("🎯 הקובץ נקלט בהצלחה במערכת. המידע מוכן לעיבוד.")
+        st.toast("🎯 קובץ הנתונים נטען ומופה בהצלחה", icon="⚡")
         
-        # 📊 כרטיסי מדדים (Metrics) מעוצבים
+        # 📊 לוח מחוונים אנליטי מהיר (Quick Metrics Dashboard)
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric(label="📊 שורות נתונים", value=f"{df.shape[0]:,}")
+            st.markdown(f"<div class='metric-box'><span style='color:#64748b; font-size:0.9rem;'>רשומות מזוהות</span><br><b style='font-size:1.8rem; color:#fff;'>{df.shape[0]:,}</b></div>", unsafe_allow_html=True)
         with col2:
-            st.metric(label="⚙️ פרמטרים שנמצאו", value=df.shape[1])
+            st.markdown(f"<div class='metric-box'><span style='color:#64748b; font-size:0.9rem;'>פרמטרים מנוהלים</span><br><b style='font-size:1.8rem; color:#fff;'>{df.shape[1]}</b></div>", unsafe_allow_html=True)
         with col3:
             cost_cols = [c for c in df.columns if any(w in c.lower() for w in ['מחיר', 'עלות', 'cost', 'price'])]
             if cost_cols:
                 total_cost = df[cost_cols[0]].sum()
-                st.metric(label="💰 היקף פיננסי מזוהה", value=f"₪{total_cost:,.0f}")
+                st.markdown(f"<div class='metric-box'><span style='color:#00f2fe; font-size:0.9rem;'>תקציב נומינלי בסיכון</span><br><b style='font-size:1.8rem; color:#00f2fe;'>₪{total_cost:,.0f}</b></div>", unsafe_allow_html=True)
             else:
-                st.metric(label="🛡️ רמת מורכבות קובץ", value="גבוהה (מומלץ לניתוח)")
+                st.markdown("<div class='metric-box'><span style='color:#e11d48; font-size:0.9rem;'>מורכבות ניתוח</span><br><b style='font-size:1.8rem; color:#e11d48;'>קריטית</b></div>", unsafe_allow_html=True)
 
-        # תצוגת נתונים בתוך קארד זכוכית
-        st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
-        st.markdown("<h4 style='color: #06b6d4; margin-top:0;'>🔍 סקירה מהירה של נתוני המקור</h4>", unsafe_allow_html=True)
-        st.dataframe(df.head(8), use_container_width=True)
+        # הצגת טבלת המקור בתוך קארד זכוכית אפליקטיבי
+        st.markdown("<div class='app-card'>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #64748b; margin-top:0; font-weight:600;'>📊 תצוגת זרם נתונים גולמי</p>", unsafe_allow_html=True)
+        st.dataframe(df.head(6), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # 🧠 לוגיקת אופטימיזציה לטקסט: מונע קריסה בקבצים גדולים
+        # אופטימיזציית טקסט מובנית לקבצים גדולים
         if df.shape[0] > 500:
-            st.warning("⚠️ הקובץ מכיל כמות שורות גדולה. המערכת תבצע מדגם מייצג של 500 השורות הראשונות לצורך ניתוח הסוכנים.")
             table_as_text = df.head(500).to_string(index=False)
         else:
             table_as_text = df.to_string(index=False)
 
     except Exception as e:
-        st.error(f"שגיאה בטעינת הקובץ: {e}")
+        st.error(f"שגיאה בעיבוד הקובץ: {e}")
         st.stop()
 else:
     st.markdown("""
-    <div style='text-align: center; padding: 40px; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; background: rgba(255,255,255,0.02);'>
-        <p style='color: #64748b; font-size: 1.1rem; margin: 0;'>גררי לכאן קובץ אקסל או CSV כדי להזניק את סוכני ה-AI</p>
+    <div style='text-align: center; padding: 60px 20px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 24px; background: rgba(255,255,255,0.01); margin-top: 15px;'>
+        <div style='font-size: 2.5rem; margin-bottom: 15px;'>📥</div>
+        <h3 style='margin: 0 0 10px 0; font-weight: 600; color: #f8fafc;'>העלי קובץ רישוי ארגוני</h3>
+        <p style='color: #64748b; max-width: 400px; margin: 0 auto; font-size: 0.95rem;'>גררי לכאן קובץ Excel או CSV כדי לאפשר לסוכני ה-AI למפות חריגות ומקרי קצה</p>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
 
-# ✅ 6. הגדרת חוקי ה-Agent וכללי הקצה המורכבים ב-System Instructions
+# ✅ 6. הגדרת חוקי ה-Agent ומקרי הקצה המורכבים
 SYSTEM_INSTRUCTION_ANALYST = """
 אתה ראש צוות אנליסטים בכיר לניהול נכסי תוכנה (SAM Lead). תפקידך לבחון את קובץ הנתונים הגולמי ולזהות חריגות על פי חוקי הרישוי הנוקשים הבאים של הארגון:
 
@@ -197,9 +211,9 @@ SYSTEM_INSTRUCTION_ARCHITECT = """
 ענה בעברית עסקית רהוטה ונקייה.
 """
 
-# ✅ 7. אזור הפעלת ארכיטקטורת הסוכנים
-st.markdown("<div style='margin: 30px 0;'>", unsafe_allow_html=True)
-if st.button("⚡ הזרק ניתוח ואופטימיזציה בזמן אמת", type="primary"):
+# ✅ 7. אזור הפעלה אינטראקטיבי
+st.markdown("<div style='margin: 10px 0 25px 0;'>", unsafe_allow_html=True)
+if st.button("⚡ הפעל ארכיטקטורת סוכנים אוטונומיים", type="primary"):
     
     try:
         # סוכן 1: Data Investigator
@@ -210,7 +224,7 @@ if st.button("⚡ הזרק ניתוח ואופטימיזציה בזמן אמת",
         
         analyst_prompt = f"להלן נתוני הרישוי הארגוניים של החברה. בצע סריקה קפדנית והפק דוח חריגות ומקרי קצה מלא:\n\n{table_as_text}"
         
-        with st.spinner("🧠 סוכן 1 (Data Analyst) מפצח את חוקי הרישוי ומאתר חריגות מקרי קצה..."):
+        with st.spinner("🤖 סוכן 1 (Data Investigator) סורק מקרי קצה ותשתיות..."):
             res1 = analyst_model.generate_content(analyst_prompt)
             analyst_report = res1.text
 
@@ -222,21 +236,21 @@ if st.button("⚡ הזרק ניתוח ואופטימיזציה בזמן אמת",
         
         architect_prompt = f"על בסיס דוח הממצאים המורכב ומקרי הקצה שמופו, גבש אסטרטגיית פעולה יישומית וסיכום מנהלים בכיר:\n\n{analyst_report}"
         
-        with st.spinner("🚀 סוכן 2 (Strategic Architect) מייצר תוכנית אופטימיזציה פיננסית וסיכום מנהלים..."):
+        with st.spinner("⚡ סוכן 2 (Strategic Architect) מגבש המלצות פיננסיות ומכתב מנהלים..."):
             res2 = architect_model.generate_content(architect_prompt)
             architect_report = res2.text
 
-        # 🌟 הצגת התוצרים בטאבים עתידניים
-        st.markdown("### 📊 תוצרי עיבוד הסוכנים")
-        tab1, tab2 = st.tabs(["🎯 ממצאי אנליסט הנתונים (מקרי קצה וחריגות)", "💎 תוכנית אסטרטגית וניסוח למנהלים"])
+        # 🌟 8. תצוגת תוצרים אפליקטיבית (App Workspace)
+        st.markdown("<p style='color: #64748b; font-weight:600; margin-bottom:15px;'>💻 סביבת עבודה אסטרטגית</p>", unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["🎯 ממצאי אנליסט הנתונים", "💎 תוכנית אסטרטגית וניסוח למנהלים"])
         
         with tab1:
-            st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='app-card'>", unsafe_allow_html=True)
             st.markdown(analyst_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
         with tab2:
-            st.markdown("<div class='cyber-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='app-card'>", unsafe_allow_html=True)
             st.markdown(architect_report)
             st.markdown("</div>", unsafe_allow_html=True)
             
@@ -246,12 +260,11 @@ if st.button("⚡ הזרק ניתוח ואופטימיזציה בזמן אמת",
         
         st.markdown("---")
         st.markdown(
-            f'<div style="text-align: left;"><a class="download-cyber" href="data:file/txt;base64,{b64}" download="SAM_Intelligence_Report.txt">📥 ייצוא דוח מלא ומסוכם</a></div>',
+            f'<div style="text-align: left;"><a class="download-action" href="data:file/txt;base64,{b64}" download="SAM_Intelligence_Report.txt">📥 ייצוא קובץ נתונים משולב</a></div>',
             unsafe_allow_html=True
         )
         
     except Exception as api_error:
-        st.error(f"❌ שגיאת תקשורת עם שרתי ה-AI: {api_error}")
-        st.info("💡 מומלץ לוודא שמפתח ה-API תקין ורכיבי הרשת ב-Streamlit מעודכנים.")
+        st.error(f"❌ שגיאת רשת במערכת ה-AI: {api_error}")
 
 st.markdown("</div>", unsafe_allow_html=True)
