@@ -4,4 +4,3 @@ google-generativeai
 openpyxl
 tabulate
 plotly
-openpyxl
